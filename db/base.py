@@ -51,17 +51,41 @@ class DB:
 
     async def get_ban_users(self) -> List[int]:
         cursor = self.ban.find({})
-        ban_users_ids = [user['user_id'] for user in cursor]
+        ban_users_ids = []
+        for user in cursor:
+            if 'user_id' not in user:
+                continue
+            uid = user['user_id']
+            if isinstance(uid, dict) and '$numberLong' in uid:
+                ban_users_ids.append(int(uid['$numberLong']))
+            else:
+                ban_users_ids.append(int(uid))
         return ban_users_ids
 
     async def get_users(self) -> List[int]:
         cursor = self.users.find({})
-        users_ids = [user['user_id'] for user in cursor]
+        users_ids = []
+        for user in cursor:
+            if 'user_id' not in user:
+                continue
+            uid = user['user_id']
+            if isinstance(uid, dict) and '$numberLong' in uid:
+                users_ids.append(int(uid['$numberLong']))
+            else:
+                users_ids.append(int(uid))
         return users_ids
 
     async def get_admins(self) -> List[int]:
         cursor = self.admins.find({})
-        admin_ids = [admin['user_id'] for admin in cursor]
+        admin_ids = []
+        for admin in cursor:
+            if 'user_id' not in admin:
+                continue
+            uid = admin['user_id']
+            if isinstance(uid, dict) and '$numberLong' in uid:
+                admin_ids.append(int(uid['$numberLong']))
+            else:
+                admin_ids.append(int(uid))
         return admin_ids
 
 

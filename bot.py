@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 
@@ -22,7 +23,10 @@ async def main():
         None
     """
     # Initialize the bot with the Telegram token and set the parse mode to HTML
-    bot = Bot(token=TOKEN_TELEGRAM, parse_mode=ParseMode.HTML)
+    bot = Bot(
+        token=TOKEN_TELEGRAM,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+    )
 
     # Initialize the dispatcher with memory storage
     dp = Dispatcher(storage=MemoryStorage())
