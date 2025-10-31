@@ -2,7 +2,7 @@ from asyncio import create_task
 
 from aiogram import Router, F, Bot
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from fluent.runtime import FluentLocalization
 
 from bot.filters.supported_media import SupportedMediaFilter
@@ -10,6 +10,19 @@ from bot.utils.utils import send_notification
 from db.base import db
 
 router_user = Router()
+
+
+def get_admin_keyboard(user_id: int) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="ℹ️ Info", callback_data=f"info:{user_id}"),
+            InlineKeyboardButton(text="✏️ Reply", callback_data=f"reply:{user_id}"),
+        ],
+        [
+            InlineKeyboardButton(text="🚫 Ban", callback_data=f"ban:{user_id}"),
+            InlineKeyboardButton(text="✅ Unban", callback_data=f"unban:{user_id}"),
+        ]
+    ])
 
 
 @router_user.message(Command("start"))
@@ -30,11 +43,13 @@ async def text_msg(message: Message, bot: Bot, l10n: FluentLocalization):
         return await message.reply(l10n.format_value("too-long-text-error"))
 
     admins = await db.get_admins()
+    keyboard = get_admin_keyboard(message.from_user.id)
     for admin in admins:
         await bot.send_message(
             chat_id=admin,
             text=message.html_text + f"\n\n#id{message.from_user.id}",
-            parse_mode="HTML"
+            parse_mode="HTML",
+            reply_markup=keyboard
         )
     await create_task(send_notification(message, message.message_id, l10n))
 
